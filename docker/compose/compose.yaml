@@ -1,5 +1,21 @@
 services:
   nginx:
-    build: ../nginx
+    image: nginx:alpine
     ports:
       - "8080:80"
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - apache
+      - portfolio
+
+  apache:
+    image: httpd:alpine
+    volumes:
+      - ../apache/html:/usr/local/apache2/htdocs/
+
+  portfolio:
+    image: nginx:alpine
+    volumes:
+      - ../portfolio:/usr/share/nginx/html
