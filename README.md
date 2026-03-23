@@ -1,6 +1,9 @@
-![Docker](https://img.shields.io/badge/docker-ready-blue)
 ![Status](https://img.shields.io/badge/status-in%20progress-yellow)
-![Version](https://img.shields.io/badge/version-v0.1.0-green)
+![Version](https://img.shields.io/badge/version-v0.1.0-blue)
+![Docker](https://img.shields.io/badge/docker-ready-blue)
+![Nginx](https://img.shields.io/badge/nginx-reverse%20proxy-green)
+![Laravel](https://img.shields.io/badge/laravel-backend-red)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
 # Home server with Docker
 ## Description
 
