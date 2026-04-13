@@ -1,21 +1,89 @@
+version: "3.9"
+
 services:
   nginx:
-    image: nginx:alpine
+    image: nginx:latest
+    container_name: nginx
     ports:
-      - "8080:80"
+      - "80:80"
     volumes:
-      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
       - ../nginx/conf.d:/etc/nginx/conf.d
     depends_on:
-      - apache
-      - portfolio
+      - frontend
+      - laravel
+      - wordpress
+    networks:
+      - frontend_net
+      - backend_net
 
-  apache:
-    image: httpd:alpine
+  frontend:
+    build: ../frontend
+    container_name: react_app
     volumes:
-      - ../apache/html:/usr/local/apache2/htdocs/
+      - ../frontend:/app
+    networks:
+      - frontend_net
 
-  portfolio:
-    image: nginx:alpine
+  laravel:
+    build: ../backend
+    container_name: laravel_app
     volumes:
-      - ../portfolio:/usr/share/nginx/html
+      - ../backend:/var/www/html
+    depends_on:
+      - postgres
+      - mariadb
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: main_db
+      DB_USERNAME: laravel_user
+      DB_PASSWORD: laravel_pass
+    networks:
+      - backend_net
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress
+    depends_on:
+      - mariadb
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: wordpress_db
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+    volumes:
+      - ../wordpress:/var/www/html
+    networks:
+      - frontend_net
+      - backend_net
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: users_db
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend_net
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d 
+    networks:
+      - backend_net
+
+volumes:
+  postgres_data:
+  mariadb_data:
+  wordpress_data:
+networks:
+  frontend_net:
+  backend_net:
